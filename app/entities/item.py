@@ -17,4 +17,4 @@ class ItemUpdate(ItemBase):
 class Item(ItemBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: str

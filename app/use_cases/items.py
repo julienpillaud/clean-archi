@@ -8,7 +8,7 @@ class ItemManager:
         return repository.create(create_data=create_data)
 
     @staticmethod
-    def get(repository: IItemRepository, obj_id: int) -> Item | None:
+    def get(repository: IItemRepository, obj_id: str) -> Item | None:
         return repository.get(obj_id=obj_id)
 
     @staticmethod

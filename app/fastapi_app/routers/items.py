@@ -29,21 +29,21 @@ def read_items(repository: Repository) -> list[Item]:
 
 
 @router.get("/{item_id}")
-def read_item(repository: Repository, item_id: int) -> Item:
+def read_item(repository: Repository, item_id: str) -> Item:
     if item := ItemManager.get(repository, obj_id=item_id):
         return item
     raise HTTPException(status_code=404, detail="Item not found")
 
 
 @router.put("/{item_id}")
-def update(repository: Repository, item_id: int, update_data: ItemUpdate) -> Item:
+def update(repository: Repository, item_id: str, update_data: ItemUpdate) -> Item:
     if item := ItemManager.get(repository, obj_id=item_id):
         return ItemManager.update(repository, obj=item, update_data=update_data)
     raise HTTPException(status_code=404, detail="Item not found")
 
 
 @router.delete("/{item_id}")
-def delete(repository: Repository, item_id: int) -> Item:
+def delete(repository: Repository, item_id: str) -> Item:
     if item := ItemManager.get(repository, obj_id=item_id):
         return ItemManager.delete(repository, obj=item)
     raise HTTPException(status_code=404, detail="Item not found")

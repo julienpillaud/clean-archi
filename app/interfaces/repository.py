@@ -22,7 +22,7 @@ class IBaseRepository(ABC, Generic[SchemaType, CreateSchemaType, UpdateSchemaTyp
         """Create a new ressource"""
 
     @abstractmethod
-    def get(self, obj_id: int) -> SchemaType | None:
+    def get(self, obj_id: str) -> SchemaType | None:
         """Get a ressource by its id"""
 
     @abstractmethod

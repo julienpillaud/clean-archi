@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
@@ -13,6 +15,7 @@ class SQLiteItemRepository(IItemRepository):
 
     def create(self, create_data: ItemCreate) -> Item:
         db_obj = self.model(
+            id=str(uuid.uuid4()),
             name=create_data.name,
             description=create_data.description,
         )
@@ -23,7 +26,7 @@ class SQLiteItemRepository(IItemRepository):
 
         return Item.model_validate(db_obj)
 
-    def get(self, obj_id: int) -> Item | None:
+    def get(self, obj_id: str) -> Item | None:
         filter_ = self.model.id == obj_id
         with self.session as session:
             obj = session.query(self.model).filter(filter_).first()
