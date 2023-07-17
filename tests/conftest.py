@@ -3,42 +3,24 @@ from collections.abc import Iterator
 import pytest
 from fastapi.testclient import TestClient
 from pytest import FixtureRequest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from app.entities.item import Item, ItemCreate
 from app.fastapi_app.main import app
 from app.interfaces.repository import IItemRepository
-from app.repository.dependencies import repository_provider
-
-# import Base class and all models before creating tables
-from app.repository.models import base
-
-SQLALCHEMY_DATABASE_URL = "sqlite://"
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Override session for tests
-repository_provider.session = SessionLocal
-
-base.Base.metadata.create_all(bind=engine)
+from app.repository.dependencies import repository_provider, testing_repository_provider
 
 
 @pytest.fixture(autouse=True)
 def repository_entity(request: FixtureRequest) -> None:
     if marker := request.node.get_closest_marker("entity"):
         entity = marker.args[0]
-        repository_provider.entity = entity
+        testing_repository_provider.entity = entity
+        app.dependency_overrides[repository_provider] = testing_repository_provider
 
 
 @pytest.fixture
 def repository() -> IItemRepository:
-    return repository_provider()
+    return testing_repository_provider()
 
 
 @pytest.fixture

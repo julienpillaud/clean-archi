@@ -10,8 +10,8 @@ def test_create_item(repository: IItemRepository) -> None:
     item_in = ItemCreate(name="Item1", description="item 1")
     item = ItemManager.create(repository, create_data=item_in)
 
-    assert item.name == "Item1"
-    assert item.description == "item 1"
+    assert item.name == item_in.name
+    assert item.description == item_in.description
 
 
 @pytest.mark.entity("item")
