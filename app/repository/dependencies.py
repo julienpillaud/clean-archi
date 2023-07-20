@@ -3,7 +3,7 @@ from enum import StrEnum, auto
 from app.interfaces.repository import IItemRepository
 from app.repository.sql.items import SQLiteItemRepository
 from app.repository.sql.session import SessionLocal
-from tests.repository import FakeItemRepository, fake_database
+from tests.fake_repository import FakeItemRepository, fake_database
 
 
 class RepositoryProviderError(Exception):

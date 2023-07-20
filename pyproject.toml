@@ -47,6 +47,9 @@ strict = true
 exclude = [
     "venv",
 ]
+plugins = [
+    "pydantic.mypy",
+]
 
 [tool.pytest.ini_options]
 markers = [
