@@ -24,8 +24,7 @@ class RepositoryProvider(BaseRepositoryProvider):
 
     def __call__(self) -> IItemRepository:
         if self.entity and (repository := self._mapping.get(self.entity)):
-            session = SessionLocal()
-            return repository(session=session)
+            return repository(session=SessionLocal)
 
         raise RepositoryProviderError("Can't defined a repository. Check entity")
 
