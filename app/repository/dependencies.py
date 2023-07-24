@@ -22,6 +22,9 @@ class BaseRepositoryProvider:
 
 
 class RepositoryProvider(BaseRepositoryProvider):
+    # This is where the code changes according to the repository
+    # we want to use for this project only.
+
     # _mapping = {Entity.ITEM: SQLiteItemRepository}
     _mapping = {Entity.ITEM: MongoItemRepository}
 

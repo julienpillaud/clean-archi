@@ -6,8 +6,6 @@ The software architecture used is known as "clean architecture."
 This is the name used by Robert Martin in his post :
 https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
 
-The first implementation is with **FastAPI** and **SQLite**.
-
 ## Installation
 ### Install dependencies
 ```
@@ -15,7 +13,6 @@ poetry install
 ```
 
 ### Run tests
-Tests are running with an SQLite In-memory database.
 ```
 pytest --cov=app --cov-report=term-missing --cov-report=html
 ```
@@ -23,5 +20,5 @@ pytest --cov=app --cov-report=term-missing --cov-report=html
 ## Roadmap
 - [x] FastAPI framework
 - [x] SQLite repository
+- [x] MongoDB repository
 - [ ] Flask framework
-- [ ] MongoDB repository
