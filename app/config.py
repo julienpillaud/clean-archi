@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
     SQLALCHEMY_DATABASE_URI: str
+    MONGODB_URI: str
+    MONGODB_DATABASE: str
 
 
 settings = Settings()
