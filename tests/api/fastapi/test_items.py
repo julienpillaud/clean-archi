@@ -37,8 +37,8 @@ def test_create_bad_data(client: TestClient) -> None:
     content = response.json()
     assert "detail" in content
     detail = content["detail"][0]
-    assert detail["type"] == "missing"
-    assert detail["msg"] == "Field required"
+    assert detail["type"] == "assertion_error"
+    assert detail["msg"] == "Assertion failed, At least one filed is required"
 
 
 @pytest.mark.entity("item")
@@ -93,6 +93,19 @@ def test_update_bad_item(client: TestClient) -> None:
     assert response.status_code == http.HTTPStatus.NOT_FOUND
     content = response.json()
     assert content["detail"] == "Item not found"
+
+
+@pytest.mark.entity("item")
+def test_update_bad_data(client: TestClient, created_item: Item) -> None:
+    data = {"not_name_or_description": ""}
+    response = client.put(f"/items/{created_item.id}", json=data)
+
+    assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY
+    content = response.json()
+    assert "detail" in content
+    detail = content["detail"][0]
+    assert detail["type"] == "assertion_error"
+    assert detail["msg"] == "Assertion failed, At least one filed is required"
 
 
 @pytest.mark.entity("item")
