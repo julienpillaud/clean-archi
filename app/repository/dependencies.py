@@ -1,11 +1,11 @@
 from enum import StrEnum, auto
 
 from app.interfaces.repository import IItemRepository
-from app.repository.mongodb.client import database  # noqa
-from app.repository.mongodb.items import MongoItemRepository  # noqa
+from app.repository.mongodb.client import database
+from app.repository.mongodb.items import MongoItemRepository
 from app.repository.sql.items import SQLiteItemRepository  # noqa
 from app.repository.sql.session import SessionLocal  # noqa
-from tests.fake_repository import FakeItemRepository, fake_database
+from tests.fake_repository import FakeItemRepository, fake_item_database
 
 
 class RepositoryProviderError(Exception):
@@ -44,7 +44,7 @@ class TestingRepositoryProvider(BaseRepositoryProvider):
 
     def __call__(self) -> IItemRepository:
         if self.entity and (repository := self._mapping.get(self.entity)):
-            return repository(database=fake_database)
+            return repository(database=fake_item_database)
 
         raise RepositoryProviderError("Can't defined a repository. Check entity")
 

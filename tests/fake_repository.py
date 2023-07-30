@@ -3,7 +3,10 @@ import uuid
 from app.entities.item import Item, ItemCreate, ItemUpdate
 from app.interfaces.repository import IItemRepository
 
-fake_database: set[Item] = set()
+fake_item_database = {
+    Item(id="1", name="Item1", description="item 1"),
+    Item(id="2", name="Item2", description="item 2"),
+}
 
 
 class FakeItemRepository(IItemRepository):

@@ -1,21 +1,17 @@
-from collections.abc import Iterator
-
 import pytest
-from fastapi.testclient import TestClient
 from pytest import FixtureRequest
 
-from app.entities.item import Item, ItemCreate
-from app.fastapi_app.main import app
+from app.entities.item import Item
 from app.interfaces.repository import IItemRepository
-from app.repository.dependencies import repository_provider, testing_repository_provider
+from app.repository.dependencies import testing_repository_provider
+from tests.fake_repository import fake_item_database
 
 
 @pytest.fixture(autouse=True)
-def repository_entity(request: FixtureRequest) -> None:
+def init_repository(request: FixtureRequest) -> None:
     if marker := request.node.get_closest_marker("entity"):
         entity = marker.args[0]
         testing_repository_provider.entity = entity
-        app.dependency_overrides[repository_provider] = testing_repository_provider
 
 
 @pytest.fixture
@@ -24,15 +20,5 @@ def repository() -> IItemRepository:
 
 
 @pytest.fixture
-def client() -> Iterator[TestClient]:
-    with TestClient(app) as test_client:
-        yield test_client
-
-
-@pytest.fixture
-def created_item(repository: IItemRepository) -> Item:
-    """Populate the database with 2 items"""
-    item_1 = ItemCreate(name="Item1", description="item 1")
-    item_2 = ItemCreate(name="Item2", description="item 2")
-    repository.create(item_1)
-    return repository.create(item_2)
+def created_item() -> Item:
+    return next(iter(fake_item_database))

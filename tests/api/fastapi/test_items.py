@@ -8,7 +8,7 @@ from app.entities.item import Item
 
 @pytest.mark.entity("item")
 def test_create_item(client: TestClient) -> None:
-    data = {"name": "Item1", "description": "item 1"}
+    data = {"name": "FastAPI Item", "description": "item"}
     response = client.post("/items", json=data)
 
     assert response.status_code == http.HTTPStatus.OK
@@ -20,12 +20,25 @@ def test_create_item(client: TestClient) -> None:
 
 @pytest.mark.entity("item")
 def test_create_existing_item(client: TestClient, created_item: Item) -> None:
-    data = {"name": created_item.name, "description": "item 1"}
+    data = {"name": created_item.name, "description": created_item.description}
     response = client.post("/items", json=data)
 
     assert response.status_code == http.HTTPStatus.BAD_REQUEST
     content = response.json()
     assert content["detail"] == "The item with this name already exists"
+
+
+@pytest.mark.entity("item")
+def test_create_bad_data(client: TestClient) -> None:
+    data = {"bad_key": ""}
+    response = client.post("/items", json=data)
+
+    assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY
+    content = response.json()
+    assert "detail" in content
+    detail = content["detail"][0]
+    assert detail["type"] == "missing"
+    assert detail["msg"] == "Field required"
 
 
 @pytest.mark.entity("item")
@@ -40,8 +53,8 @@ def test_read_item(client: TestClient, created_item: Item) -> None:
 
 
 @pytest.mark.entity("item")
-def test_read_bad_item(client: TestClient, created_item: Item) -> None:
-    response = client.get(f"/items/{'1' * 24}")
+def test_read_bad_item(client: TestClient) -> None:
+    response = client.get("/items/0")
 
     assert response.status_code == http.HTTPStatus.NOT_FOUND
     content = response.json()
@@ -49,7 +62,7 @@ def test_read_bad_item(client: TestClient, created_item: Item) -> None:
 
 
 @pytest.mark.entity("item")
-def test_read_items(client: TestClient, created_item: Item) -> None:
+def test_read_items(client: TestClient) -> None:
     response = client.get("/items")
 
     assert response.status_code == http.HTTPStatus.OK
@@ -73,9 +86,9 @@ def test_update_item(client: TestClient, created_item: Item) -> None:
 
 
 @pytest.mark.entity("item")
-def test_update_bad_item(client: TestClient, created_item: Item) -> None:
+def test_update_bad_item(client: TestClient) -> None:
     data = {"name": "Toto"}
-    response = client.put(f"/items/{'1' * 24}", json=data)
+    response = client.put("/items/0", json=data)
 
     assert response.status_code == http.HTTPStatus.NOT_FOUND
     content = response.json()
@@ -94,8 +107,8 @@ def test_delete_item(client: TestClient, created_item: Item) -> None:
 
 
 @pytest.mark.entity("item")
-def test_delete_bad_item(client: TestClient, created_item: Item) -> None:
-    response = client.delete(f"items/{'1' * 24}")
+def test_delete_bad_item(client: TestClient) -> None:
+    response = client.delete("items/0")
 
     assert response.status_code == http.HTTPStatus.NOT_FOUND
     content = response.json()

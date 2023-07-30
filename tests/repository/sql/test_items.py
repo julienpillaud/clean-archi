@@ -5,47 +5,24 @@ from app.entities.item import Item, ItemCreate, ItemUpdate
 from app.repository.sql.items import SQLiteItemRepository
 
 
-def insert(session: sessionmaker[Session], items: list[Item]) -> None:
-    item_1, item_2 = items
-    stmt = text(
-        """
-        INSERT INTO item
-        VALUES
-            (:id1, :name1, :description1),
-            (:id2, :name2, :description2)
-        """
-    )
-    session().execute(
-        stmt,
-        {
-            "id1": item_1.id,
-            "name1": item_1.name,
-            "description1": item_1.description,
-            "id2": item_2.id,
-            "name2": item_2.name,
-            "description2": item_2.description,
-        },
-    )
-
-
-def test_create(session: sessionmaker[Session]) -> None:
-    repo = SQLiteItemRepository(session=session)
+def test_create(session_local: sessionmaker[Session]) -> None:
+    repo = SQLiteItemRepository(session=session_local)
     item_create = ItemCreate(name="Item test", description="item test")
     repo.create(create_data=item_create)
 
     stmt = text("SELECT * FROM item WHERE name = :name")
-    row = session().execute(stmt, {"name": item_create.name}).first()
+    with session_local() as session:
+        row = session.execute(stmt, {"name": item_create.name}).first()
 
     assert row
     assert row.name == item_create.name
     assert row.description == item_create.description
 
 
-def test_get(session: sessionmaker[Session], items: list[Item]) -> None:
+def test_get(session_local: sessionmaker[Session], items: list[Item]) -> None:
     item_in = items[0]
-    insert(session, items)
 
-    repo = SQLiteItemRepository(session=session)
+    repo = SQLiteItemRepository(session=session_local)
     item = repo.get(obj_id=item_in.id)
 
     assert item
@@ -54,11 +31,10 @@ def test_get(session: sessionmaker[Session], items: list[Item]) -> None:
     assert item.description == item_in.description
 
 
-def test_get_by_name(session: sessionmaker[Session], items: list[Item]) -> None:
+def test_get_by_name(session_local: sessionmaker[Session], items: list[Item]) -> None:
     item_in = items[0]
-    insert(session, items)
 
-    repo = SQLiteItemRepository(session=session)
+    repo = SQLiteItemRepository(session=session_local)
     item = repo.get_by_name(item_name=item_in.name)
 
     assert item
@@ -67,39 +43,37 @@ def test_get_by_name(session: sessionmaker[Session], items: list[Item]) -> None:
     assert item.description == item_in.description
 
 
-def test_get_multi(session: sessionmaker[Session], items: list[Item]) -> None:
-    insert(session, items)
+def test_get_multi(session_local: sessionmaker[Session], items: list[Item]) -> None:
+    repo = SQLiteItemRepository(session=session_local)
+    db_items = repo.get_multi()
 
-    repo = SQLiteItemRepository(session=session)
-    items = repo.get_multi()
-
-    assert len(items) == 2
+    assert db_items == items
 
 
-def test_update(session: sessionmaker[Session], items: list[Item]) -> None:
+def test_update(session_local: sessionmaker[Session], items: list[Item]) -> None:
     item_in = items[0]
-    insert(session, items)
 
-    repo = SQLiteItemRepository(session=session)
+    repo = SQLiteItemRepository(session=session_local)
     item_update = ItemUpdate(description="updated description")
     repo.update(obj=item_in, update_data=item_update)
 
     stmt = text("SELECT name, description FROM item WHERE id = :id")
-    row = session().execute(stmt, {"id": item_in.id}).first()
+    with session_local() as session:
+        row = session.execute(stmt, {"id": item_in.id}).first()
 
     assert row
     assert row.name == item_in.name
     assert row.description == item_update.description
 
 
-def test_delete(session: sessionmaker[Session], items: list[Item]) -> None:
+def test_delete(session_local: sessionmaker[Session], items: list[Item]) -> None:
     item_in = items[0]
-    insert(session, items)
 
-    repo = SQLiteItemRepository(session=session)
+    repo = SQLiteItemRepository(session=session_local)
     repo.delete(item_in)
 
     stmt = text("SELECT name, description FROM item WHERE id = :id")
-    row = session().execute(stmt, {"id": item_in.id}).first()
+    with session_local() as session:
+        row = session.execute(stmt, {"id": item_in.id}).first()
 
     assert not row
